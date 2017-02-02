@@ -15,6 +15,8 @@ http://www.thingiverse.com/thing:1454048
 
 [![Robot arm](http://img.youtube.com/vi/GgLti6NJNiU/0.jpg)](http://www.youtube.com/watch?v=GgLti6NJNiU)
 
+## Control board: 
+[![Robot arm](https://github.com/iotmakervn/iot-wifi-uno-hw/raw/master/assets/Iot-wifi-uno-hw-pinout.png)](https://github.com/iotmakervn/iot-wifi-uno-hw)
 
 
 #FSBrowserNG
