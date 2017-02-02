@@ -1,3 +1,22 @@
+# FSBrowserNG - Robot ARM control
+## Pinout: 
+```
+GPIO14 -- Rotate
+GPIO12 -- Up/Down
+GPIO13 -- Forward/Backward
+GPIO15 -- Clip In/Out 
+```
+
+## 3D printed EEZYbotARM MK2
+
+http://www.thingiverse.com/thing:1454048
+
+## Demo: 
+
+[![Robot arm](http://img.youtube.com/vi/GgLti6NJNiU/0.jpg)](http://www.youtube.com/watch?v=GgLti6NJNiU)
+
+
+
 #FSBrowserNG
 Full autocontained (on SPIFFS) async web server on ESP8266. Written as a Library.
 
