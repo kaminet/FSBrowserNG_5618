@@ -643,6 +643,44 @@ void AsyncFSWebServer::send_general_configuration_values_html(AsyncWebServerRequ
     DEBUGLOG("\r\n");
 }
 
+void AsyncFSWebServer::send_robot_arm_values_html(AsyncWebServerRequest *request) {
+    String values = "";
+    if (request->args() > 0) 
+    {
+        for (uint8_t i = 0; i < request->args(); i++) {
+            DEBUGLOG("Arg %d: %s\r\n", i, request->arg(i).c_str());
+            if (request->argName(i) == "rotate") {
+                robot_rotate = request->arg(i).toInt();
+                servo_rotate.write(robot_rotate);
+                continue;
+            }
+            if (request->argName(i) == "updown") {
+                robot_updown = request->arg(i).toInt();
+                servo_updown.write(robot_updown);
+                continue;
+            }
+            if (request->argName(i) == "fwdbwd") {
+                robot_fwdbwd = request->arg(i).toInt();
+                servo_fwdbwd.write(robot_fwdbwd);
+                continue;
+            }
+            if (request->argName(i) == "clipinout") {
+                robot_clipinout = request->arg(i).toInt();
+                servo_clipinout.write(robot_clipinout);
+                continue;
+            }
+        }
+        
+
+    }
+    
+    values += "rotate|" + (String)robot_rotate + "|input\n";
+    values += "updown|" + (String)robot_updown + "|input\n";
+    values += "fwdbwd|" + (String)robot_fwdbwd + "|input\n";
+    values += "clipinout|" + (String)robot_clipinout + "|input\n";
+    request->send(200, "text/plain", values);
+}
+
 void AsyncFSWebServer::send_network_configuration_values_html(AsyncWebServerRequest *request) {
 
     String values = "";
@@ -829,9 +867,12 @@ void AsyncFSWebServer::send_network_configuration_html(AsyncWebServerRequest *re
             if (request->argName(i) == "dns_3") { if (checkRange(request->arg(i))) 	_config.dns[3] = request->arg(i).toInt(); continue; }
             if (request->argName(i) == "dhcp") { _config.dhcp = true; continue; }
         }
-        request->send_P(200, "text/html", Page_WaitAndReload);
+
+//        request->send_P(200, "text/html", Page_WaitAndReload);
+//        request->send(200, "text/html", Page_WaitAndReload);
+          handleFileRead(request->url(), request);
         save_config();
-        //yield();
+//        //yield();
         delay(1000);
         _fs->end();
         ESP.restart();
@@ -1098,6 +1139,23 @@ void AsyncFSWebServer::updateFirmware(AsyncWebServerRequest *request, String fil
 
 void AsyncFSWebServer::serverInit() {
     //SERVER INIT
+    
+    //load value
+    on("/robotarm/value", HTTP_GET, [this](AsyncWebServerRequest *request) {
+        if (!this->checkAuth(request))
+            return request->requestAuthentication();
+        this->send_robot_arm_values_html(request);
+        
+    });
+
+    //load file
+    on("/robotarm", HTTP_GET, [this](AsyncWebServerRequest *request) {
+        if (!this->checkAuth(request))
+            return request->requestAuthentication();
+        if (!this->handleFileRead("/robotarm.html", request))
+            request->send(404, "text/plain", "FileNotFound");
+    });
+
     //list directory
     on("/list", HTTP_GET, [this](AsyncWebServerRequest *request) {
         if (!this->checkAuth(request))
@@ -1328,7 +1386,17 @@ void AsyncFSWebServer::serverInit() {
     });
     //server.begin(); --> Not here
     DEBUGLOG("HTTP server started\r\n");
+
+    servo_rotate.attach(14);
+    servo_updown.attach(12);
+    servo_fwdbwd.attach(13);
+    servo_clipinout.attach(15);
+    servo_rotate.write(robot_rotate);
+    servo_updown.write(robot_updown);
+    servo_fwdbwd.write(robot_fwdbwd);
+    servo_clipinout.write(robot_clipinout);
 }
+
 
 bool AsyncFSWebServer::checkAuth(AsyncWebServerRequest *request) {
     if (!_httpAuth.auth) {
@@ -1357,4 +1425,3 @@ AsyncFSWebServer& AsyncFSWebServer::setPOSTCallback(POST_CALLBACK_SIGNATURE) {
 	this->postcallback = postcallback;
 	return *this;
 }
-

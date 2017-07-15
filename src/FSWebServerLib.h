@@ -20,6 +20,7 @@
 #include <Ticker.h>
 #include <ArduinoOTA.h>
 #include <ArduinoJson.h>
+#include <Servo.h> 
 
 #define RELEASE  // Comment to enable debug output
 
@@ -31,8 +32,8 @@
 #define DEBUGLOG(...)
 #endif
 
-#define CONNECTION_LED 2 // Connection LED pin (Built in). -1 to disable
-#define AP_ENABLE_BUTTON 4 // Button pin to enable AP during startup for configuration. -1 to disable
+#define CONNECTION_LED 16 // Connection LED pin (Built in). -1 to disable
+#define AP_ENABLE_BUTTON 0 // Button pin to enable AP during startup for configuration. -1 to disable
 
 
 #define CONFIG_FILE "/config.json"
@@ -96,7 +97,8 @@ protected:
     long wifiDisconnectedSince = 0;
     String _browserMD5 = "";
     uint32_t _updateSize = 0;
-
+    int robot_rotate = 90, robot_updown = 140, robot_fwdbwd = 150, robot_clipinout = 0;
+    Servo servo_rotate, servo_updown, servo_fwdbwd, servo_clipinout;
     WiFiEventHandler onStationModeConnectedHandler, onStationModeDisconnectedHandler;
 
     //uint currentWifiStatus;
@@ -131,6 +133,7 @@ protected:
     void handleFileCreate(AsyncWebServerRequest *request);
     void handleFileDelete(AsyncWebServerRequest *request);
     void handleFileUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final);
+    void send_robot_arm_values_html(AsyncWebServerRequest *request);
     void send_general_configuration_values_html(AsyncWebServerRequest *request);
     void send_network_configuration_values_html(AsyncWebServerRequest *request);
     void send_connection_state_values_html(AsyncWebServerRequest *request);
