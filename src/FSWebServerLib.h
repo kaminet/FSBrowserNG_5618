@@ -21,7 +21,7 @@
 #include <ArduinoOTA.h>
 #include <ArduinoJson.h>
 
-#define RELEASE  // Comment to enable debug output
+// #define RELEASE  // Comment to enable debug output
 
 #define DBG_OUTPUT_PORT Serial
 
@@ -31,9 +31,11 @@
 #define DEBUGLOG(...)
 #endif
 
-#define CONNECTION_LED 2 // Connection LED pin (Built in). -1 to disable
-#define AP_ENABLE_BUTTON 4 // Button pin to enable AP during startup for configuration. -1 to disable
+#define CONNECTION_LED 16 // Connection LED pin (Built in). -1 to disable
+#define AP_ENABLE_BUTTON 14 // Button pin to enable AP during startup for configuration. -1 to disable
 
+#define arm1            2 // D4 on ESP8266 dir output
+#define arm2            4  // D2 motor's PWM output
 
 #define CONFIG_FILE "/config.json"
 #define SECRET_FILE "/secret.json"

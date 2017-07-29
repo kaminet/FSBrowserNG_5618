@@ -103,6 +103,11 @@ void AsyncFSWebServer::begin(FS* fs) {
         digitalWrite(CONNECTION_LED, HIGH); // Turn LED off
     }
 
+   // ---- SETUP I/O
+      pinMode(arm1, OUTPUT);
+      pinMode(arm2, OUTPUT);
+
+
     if (!_fs) // If SPIFFS is not started
         _fs->begin();
 #ifndef RELEASE
@@ -1326,6 +1331,55 @@ void AsyncFSWebServer::serverInit() {
         request->send(200, "text/json", json);
         json = String();
     });
+
+    on("/pin/value", HTTP_GET, [](AsyncWebServerRequest *request) {
+          String values = "";
+          if (request->args() > 0)
+          {
+              for (uint8_t i = 0; i < request->args(); i++) {
+                  DEBUGLOG("Arg %d: ID: %s = %s\r\n", i, request->argName(i).c_str(), request->arg(i).c_str());
+                  if (request->argName(i) == "A1") {
+                      // pinMode(arm1, OUTPUT);
+                      analogWrite(arm1, request->arg(i).toInt());
+                      delay(20);
+                      continue;
+                  }
+                  if (request->argName(i) == "A2") {
+                      // pinMode(arm2, OUTPUT);
+                      analogWrite(arm2, request->arg(i).toInt());
+                      delay(20);
+                      continue;
+                  }
+                  if (request->argName(i) == "D1") {
+                      if (request->arg(i) == "ON"){
+                        analogWrite(arm1, 0);
+                        digitalWrite(arm1, HIGH);
+                      } else if (request->arg(i) == "OFF"){
+                        analogWrite(arm1, 0);
+                        digitalWrite(arm1, LOW);
+                      }
+                      continue;
+                  }
+                  if (request->argName(i) == "D2") {
+                      if (request->arg(i) == "ON"){
+                        analogWrite(arm2, 0);
+                        digitalWrite(arm2, HIGH);
+                      } else if (request->arg(i) == "OFF"){
+                        analogWrite(arm2, 0);
+                        digitalWrite(arm2, LOW);
+                      }
+                      continue;
+                  }
+              }
+          }
+
+
+          values += "D1V|" + (String)digitalRead(arm1) + "|input\n";
+          values += "D2V|" + (String)digitalRead(arm2) + "|input\n";
+          request->send(200, "text/plain", values);
+            // this->send_robot_arm_values_html(request);
+    });
+
     //server.begin(); --> Not here
     DEBUGLOG("HTTP server started\r\n");
 }
